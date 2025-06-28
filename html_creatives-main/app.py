@@ -86,16 +86,22 @@ def fetch_google_images(query, num_images=3, max_retries = 5 ):
         return list(set(res_urls))
 def play_sound(audio_file_path):
     """Plays an audio file in the Streamlit app."""
-    with open(audio_file_path, "rb") as f:
-        data = f.read()
-        b64 = base64.b64encode(data).decode()
-        md = f"""
-            <audio autoplay>
-            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-            </audio>
-        """
-        st.markdown(md, unsafe_allow_html=True)
-
+    try:
+        with open(audio_file_path, "rb") as f:
+            data = f.read()
+            b64 = base64.b64encode(data).decode()
+            md = f"""
+                <audio autoplay>
+                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+                </audio>
+            """
+            st.markdown(md, unsafe_allow_html=True)
+    except FileNotFoundError:
+        # Silently skip if audio file is not found
+        pass
+    except Exception as e:
+        # Optional: log the error for debugging
+        st.write(f"Could not play audio: {e}")
 
 def gen_flux_img(prompt, height=784, width=960):
     """
