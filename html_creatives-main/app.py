@@ -467,7 +467,47 @@ def gen_flux_img_lora(prompt,height=784, width=960 ,lora_path="https://huggingfa
             retries +=1
             st.text(e)
 
+def resize_image_to_target_size(image, target_width, target_height):
+    """
+    Resize/crop a PIL image to exact target dimensions
+    """
+    from PIL import Image
+    
+    # Get current dimensions
+    current_width, current_height = image.size
+    target_ratio = target_width / target_height
+    current_ratio = current_width / current_height
+    
+    # If the image needs to be made taller (like 300x600)
+    if target_ratio < current_ratio:
+        # Image is too wide, crop the sides
+        new_width = int(current_height * target_ratio)
+        left = (current_width - new_width) // 2
+        image = image.crop((left, 0, left + new_width, current_height))
+    else:
+        # Image is too tall, crop top/bottom
+        new_height = int(current_width / target_ratio)
+        top = (current_height - new_height) // 2
+        image = image.crop((0, top, current_width, top + new_height))
+    
+    # Resize to exact target dimensions
+    image = image.resize((target_width, target_height), Image.Resampling.LANCZOS)
+    return image
 
+# Add this after Gemini generates the image:
+# (Find the section where you upload to S3 and add this before uploading)
+
+if gemini_img_bytes is not None:
+    # Get target size
+    size_key = row.get("size", "1000x1000")
+    size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
+    
+    # Resize the image to exact target dimensions
+    gemini_img_bytes = resize_image_to_target_size(
+        gemini_img_bytes, 
+        size_config["width"], 
+        size_config["height"]
+    )
 
 #@log_function_call
 def capture_html_screenshot_playwright(html_content,width = 1000, height = 1000):
@@ -1436,6 +1476,12 @@ Format: {size_prompt}""",model="gpt-4o", temperature= 1.0)
                                     st.text(f"img prompt {prompt}")
                                     gemini_img_bytes = gen_gemini_image(prompt)
                                     if gemini_img_bytes is not None:
+                                        # Resize the image to exact target dimensions
+                                        gemini_img_bytes = resize_image_to_target_size(
+                                        gemini_img_bytes, 
+                                        size_config["width"], 
+                                        size_config["height"]
+                                        )
 
                                         gemini_image_url = upload_pil_image_to_s3(image = gemini_img_bytes ,bucket_name=S3_BUCKET_NAME,
                                                     aws_access_key_id=AWS_ACCESS_KEY_ID,
