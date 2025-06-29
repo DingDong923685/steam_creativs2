@@ -1735,9 +1735,14 @@ if st.button("Process Selected Images"):
                 else:
                     tag_line = ''
 
-                # Build final HTML
-                size_key = row.get("size", "1000x1000")
-                size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
+# Build final HTML - get size from the original dataframe
+# Find the corresponding row in the dataframe for this topic/lang
+df_row = df[(df['topic'] == topic) & (df['lang'] == lang)]
+if not df_row.empty:
+    size_key = df_row.iloc[0].get("size", "1000x1000")
+else:
+    size_key = "1000x1000"  # fallback
+size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
               
                 html_content = save_html(
                     headline=headline_text,
@@ -1750,8 +1755,6 @@ if st.button("Process Selected Images"):
                 )
 
                 # Capture screenshot
-                size_key = row.get("size", "1000x1000")  # Default to 1000x1000 if not specified
-                size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
                 if template == 8:
                     screenshot_image = capture_html_screenshot_playwright(html_content, 
         width=size_config["width"], 
