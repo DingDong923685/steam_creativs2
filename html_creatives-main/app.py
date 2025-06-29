@@ -497,10 +497,7 @@ def resize_image_to_target_size(image, target_width, target_height):
 # Add this after Gemini generates the image:
 # (Find the section where you upload to S3 and add this before uploading)
 
-if gemini_img_bytes is not None:
-    # Get target size
-    size_key = row.get("size", "1000x1000")
-    size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
+
     
     # Resize the image to exact target dimensions
     gemini_img_bytes = resize_image_to_target_size(
@@ -1476,6 +1473,9 @@ Format: {size_prompt}""",model="gpt-4o", temperature= 1.0)
                                     st.text(f"img prompt {prompt}")
                                     gemini_img_bytes = gen_gemini_image(prompt)
                                     if gemini_img_bytes is not None:
+                                        # Get target size
+                                        size_key = row.get("size", "1000x1000")
+                                        size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
                                         # Resize the image to exact target dimensions
                                         gemini_img_bytes = resize_image_to_target_size(
                                         gemini_img_bytes, 
