@@ -1739,10 +1739,10 @@ if st.button("Process Selected Images"):
                     # Find the corresponding row in the dataframe for this topic/lang
                     df_row = df[(df['topic'] == topic) & (df['lang'] == lang)]
                     if not df_row.empty:
-                    size_key = df_row.iloc[0].get("size", "1000x1000")
+                         size_key = df_row.iloc[0].get("size", "1000x1000")
                 else:
-                   size_key = "1000x1000"  # fallback
-                   size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
+                         size_key = "1000x1000"  # fallback
+                         size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
               
                 html_content = save_html(
                     headline=headline_text,
