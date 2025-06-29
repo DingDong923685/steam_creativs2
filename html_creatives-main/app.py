@@ -21,6 +21,13 @@ import openai
 import logging
 from openai import OpenAI
 import tempfile
+# Size configurations
+SIZE_CONFIGS = {
+    "1000x1000": {"width": 1000, "height": 1000},
+    "300x250": {"width": 300, "height": 250}, 
+    "300x600": {"width": 300, "height": 600}
+}
+
 # Configure logging
 logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(name)s - %(message)s', 
@@ -496,7 +503,7 @@ def capture_html_screenshot_playwright(html_content,width = 1000, height = 1000)
         return None
 
 #@log_function_call
-def save_html(headline, image_url, cta_text, template, tag_line='', output_file="advertisement.html"):
+def save_html(headline, image_url, cta_text, template, tag_line='', output_file="advertisement.html", width=1000, height=1000):
     """
     Returns an HTML string based on the chosen template ID (1..6, 41, 42, etc.).
     """
@@ -521,8 +528,8 @@ def save_html(headline, image_url, cta_text, template, tag_line='', output_file=
                    height: 100vh;
                }}
                .ad-container {{
-                   width: 1000px;
-                   height: 1000px;
+                   width: {width}px;
+                   height: {height}px;
                    border: 1px solid #ddd;
                    border-radius: 20px;
                    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
@@ -591,8 +598,8 @@ def save_html(headline, image_url, cta_text, template, tag_line='', output_file=
                     height: 100vh;
                 }}
                 .ad-container {{
-                    width: 1000px;
-                    height: 1000px;
+                   width: {width}px;
+                   height: {height}px;
                     border: 2px solid black;
                     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
                     display: flex;
@@ -666,16 +673,16 @@ def save_html(headline, image_url, cta_text, template, tag_line='', output_file=
                 }}
                 .container {{
                     position: relative;
-                    width: 1000px;
-                    height: 1000px;
+                   width: {width}px;
+                   height: {height}px;
                     margin: 0;
                     padding: 0;
                     overflow: hidden;
                     box-shadow: 0 0 20px rgba(0,0,0,0.2);
                 }}
                 .image {{
-                    width: 1000px;
-                    height: 1000px;
+                   width: {width}px;
+                   height: {height}px;
                     object-fit: cover;
                     filter: saturate(130%) contrast(110%);
                     transition: transform 0.3s ease;
@@ -778,8 +785,8 @@ def save_html(headline, image_url, cta_text, template, tag_line='', output_file=
                 }}
                 .container {{
                     position: relative;
-                    width: 1000px;
-                    height: 1000px;
+                   width: {width}px;
+                   height: {height}px;
                     background-image: url('{image_url}');
                     background-size: cover;
                     background-position: center;
@@ -842,8 +849,8 @@ def save_html(headline, image_url, cta_text, template, tag_line='', output_file=
                     box-sizing: border-box;
                 }}
                 body {{
-                    width: 1000px;
-                    height: 1000px;
+                   width: {width}px;
+                   height: {height}px;
                     margin: 0 auto;
                     font-family: 'Outfit', sans-serif;
                 }}
@@ -976,8 +983,8 @@ def save_html(headline, image_url, cta_text, template, tag_line='', output_file=
                 }}
                 .container {{
                     position: relative;
-                    width: 1000px;
-                    height: 1000px;
+                   width: {width}px;
+                   height: {height}px;
                     background-image: url('{image_url}');
                     background-size: cover;
                     background-position: center;
@@ -1049,8 +1056,8 @@ def save_html(headline, image_url, cta_text, template, tag_line='', output_file=
                 }}
                 .container {{
                     position: relative;
-                    width: 1000px;
-                    height: 1000px;
+                   width: {width}px;
+                   height: {height}px;
                     background-image: url('{image_url}');
                     background-size: cover;
                     background-position: center;
@@ -1122,8 +1129,8 @@ def save_html(headline, image_url, cta_text, template, tag_line='', output_file=
                 }}
                 .container {{
                     position: relative;
-                    width: 1000px;
-                    height: 1000px;
+                    width: {width}px;
+                    height: {height}px;
                     background-image: url('{image_url}');
                     background-size: cover;
                     background-position: center;
@@ -1249,7 +1256,7 @@ if 'generated_images' not in st.session_state:
 
 st.subheader("Enter Topics for Image Generation")
 df = st.data_editor(
-    pd.DataFrame({"topic": ["example_topic"], "count": [1], "lang": ["english"], "template": [""]}),
+    pd.DataFrame({"topic": ["example_topic"], "count": [1], "lang": ["english"], "template": [""],"size": ["1000x1000"]}),
 
     num_rows="dynamic",
     key="table_input"
@@ -1729,20 +1736,33 @@ if st.button("Process Selected Images"):
                     tag_line = ''
 
                 # Build final HTML
+                size_key = row.get("size", "1000x1000")
+                size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
               
                 html_content = save_html(
                     headline=headline_text,
                     image_url=img['url'],
                     cta_text=cta_text,
                     template=int(template),
-                    tag_line=tag_line
+                    tag_line=tag_line,
+                    width=size_config["width"],
+                    height=size_config["height"]
                 )
 
                 # Capture screenshot
+                size_key = row.get("size", "1000x1000")  # Default to 1000x1000 if not specified
+                size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
                 if template == 8:
-                    screenshot_image = capture_html_screenshot_playwright(html_content,width=720,height = 480)
+                    screenshot_image = capture_html_screenshot_playwright(html_content, 
+        width=size_config["width"], 
+        height=size_config["height"]
+    )
                 else:
-                    screenshot_image = capture_html_screenshot_playwright(html_content)
+                        screenshot_image = capture_html_screenshot_playwright(
+        html_content,
+        width=size_config["width"], 
+        height=size_config["height"]
+    )
 
 
                 if screenshot_image:
