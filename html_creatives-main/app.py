@@ -1666,7 +1666,7 @@ if st.button("Process Selected Images"):
             for i in range(img['selected_count']):
                 template = img['template']
 
-                if    type(template) == str and "gemini" in template:
+                if type(template) == str and "gemini" in template:
                     res[f'Image_{idx + 1}__{i + 1}'] = img['url']
                     continue
 
@@ -1678,21 +1678,20 @@ if st.button("Process Selected Images"):
                     )
                 elif template in [3]:
                     headline_prompt = (
-                        f"write 1 statement, same length, no quotes, for {re.sub('\\|.*','',topic)} in {lang}."
+                        f"write 1 statement, same length, no quotes, for {re.sub(r'\\|.*','',topic)} in {lang}."
                         f"Examples:\n'Surprising Travel Perks You Might Be Missing'\n"
                         f"'Little-Known Tax Tricks to Save Big'\n"
                         f"Dont mention 'Hidden' or 'Unlock'."
                     )
                 elif template in [5]:
                     headline_prompt = (
-                        f"write 1 statement, same length, no quotes, for {re.sub('\\|.*','',topic)} in {lang}. "
+                        f"write 1 statement, same length, no quotes, for {re.sub(r'\\|.*','',topic)} in {lang}. "
                         f"ALL IN CAPS. wrap the 1-2 most urgent words in <span class='highlight'>...</span>."
                         f"Make it under 60 chars total, to drive curiosity."
                     )
                 elif template in [7]:
-                    headline_prompt = (f"write short punchy 1 sentence text to   this article: \n casual and sharp and consice\nuse ill-tempered language\n don't address the reader (don't use 'you' and etc)\n  \nAvoid dark themes like drugs, death etc..\n MAX 70 CHARS, no !, Title Case, in lang {lang} for: {re.sub('\\|.*','',topic)}")
-                        
-
+                    cleaned_topic = re.sub(r'\\|.*','',topic)
+                    headline_prompt = (f"write short punchy 1 sentence text to   this article: \n casual and sharp and consice\nuse ill-tempered language\n don't address the reader (don't use 'you' and etc)\n  \nAvoid dark themes like drugs, death etc..\n MAX 70 CHARS, no !, Title Case, in lang {lang} for: {cleaned_topic}")
                 else:
                     headline_prompt = f"Write a concise headline for {topic} in {lang}, no quotes."
 
@@ -1725,8 +1724,9 @@ if st.button("Process Selected Images"):
 
                 # If template=5, generate a "tag_line"
                 if template == 5:
+                    cleaned_topic_tagline = re.sub(r'\\|.*','',topic)
                     tag_line = chatGPT(
-                        f"Write a short tagline for {re.sub('\\|.*','',topic)} in {lang}, "
+                        f"Write a short tagline for {cleaned_topic_tagline} in {lang}, "
                         f"to drive action, max 25 chars, ALL CAPS, possibly with emoji. "
                         f"Do NOT mention the topic explicitly."
                     ).strip('"').strip("'").strip("!")
@@ -1735,14 +1735,15 @@ if st.button("Process Selected Images"):
                 else:
                     tag_line = ''
 
-                    # Build final HTML - get size from the original dataframe
-                    # Find the corresponding row in the dataframe for this topic/lang
-                    df_row = df[(df['topic'] == topic) & (df['lang'] == lang)]
-                    if not df_row.empty:
-                         size_key = df_row.iloc[0].get("size", "1000x1000")
+                # Build final HTML - get size from the original dataframe
+                # Find the corresponding row in the dataframe for this topic/lang
+                df_row = df[(df['topic'] == topic) & (df['lang'] == lang)]
+                if not df_row.empty:
+                    size_key = df_row.iloc[0].get("size", "1000x1000")
                 else:
-                         size_key = "1000x1000"  # fallback
-                         size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
+                    size_key = "1000x1000"  # fallback
+                
+                size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
               
                 html_content = save_html(
                     headline=headline_text,
@@ -1756,17 +1757,17 @@ if st.button("Process Selected Images"):
 
                 # Capture screenshot
                 if template == 8:
-                    screenshot_image = capture_html_screenshot_playwright(html_content, 
-        width=size_config["width"], 
-        height=size_config["height"]
-    )
+                    screenshot_image = capture_html_screenshot_playwright(
+                        html_content, 
+                        width=size_config["width"], 
+                        height=size_config["height"]
+                    )
                 else:
-                        screenshot_image = capture_html_screenshot_playwright(
-        html_content,
-        width=size_config["width"], 
-        height=size_config["height"]
-    )
-
+                    screenshot_image = capture_html_screenshot_playwright(
+                        html_content,
+                        width=size_config["width"], 
+                        height=size_config["height"]
+                    )
 
                 if screenshot_image:
                     st.image(screenshot_image, caption=f"Generated Advertisement for {topic}", width=600)
