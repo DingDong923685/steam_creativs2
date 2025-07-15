@@ -25,7 +25,8 @@ import tempfile
 SIZE_CONFIGS = {
     "1000x1000": {"width": 1000, "height": 1000},
     "300x250": {"width": 300, "height": 250}, 
-    "300x600": {"width": 300, "height": 600}
+    "300x600": {"width": 300, "height": 600},
+    "320x50": {"width": 320, "height": 50}
 }
 
 # Configure logging
@@ -1392,6 +1393,8 @@ if st.button("Generate Images"):
                         size_prompt = "rectangular banner image aspect ratio of 6:5 (300x250 banner format)"
                     elif size_key == "300x600":
                         size_prompt = "tall vertical rectangular image aspect ratio of 1:2 (300x600 skyscraper format)"
+                    elif size_key == "320x50":
+                        size_prompt = "wide horizontal rectangular image aspect ratio of 32:5 (320x50 banner format)"
                     else:
                         size_prompt = "square image aspect ratio of 1:1"
 
