@@ -820,7 +820,7 @@ def save_html(headline, image_url, cta_text, template, tag_line='', output_file=
         </body>
         </html>
         """
-    # Template 5
+            # Template 5
     elif template == 5:
         html_template = f"""
         <!DOCTYPE html>
@@ -1403,6 +1403,42 @@ Format: {size_prompt}""", model="gpt-4o", temperature=1.0)
                                         size_key = row.get("size", "1000x1000")
                                         size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
                                         # Resize to exact target dimensions
+                                        gemini_img_bytes = resize_image_to_target_size(
+                                            gemini_img_bytes, 
+                                            size_config["width"], 
+                                            size_config["height"]
+                                        )
+
+                                        gemini_image_url = upload_pil_image_to_s3(
+                                            image=gemini_img_bytes,
+                                            bucket_name=S3_BUCKET_NAME,
+                                            aws_access_key_id=AWS_ACCESS_KEY_ID,
+                                            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+                                            region_name=AWS_REGION
+                                        )
+                                    else:
+                                        st.text('Image not created, retry')
+                                        continue
+                                    if gemini_image_url:
+                                        topic_images.append({
+                                            'url': gemini_image_url,
+                                            'selected': False,
+                                            'template': template_str,
+                                            'source': 'gemini',
+                                            'dalle_generated': False
+                                        })
+
+                                    my_bar.progress(percent_complete, text=progress_text)
+                                    completed_images_count += 1
+                                    batch_complete_counter += 1
+                        else:
+                            st.text(f"img prompt {gemini_prompt.replace('\n', '')}")
+                            gemini_img_bytes = gen_gemini_image(gemini_prompt)
+                            if gemini_img_bytes is not None:
+                                # Get the target size from the row
+                                size_key = row.get("size", "1000x1000")
+                                size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
+                                # Resize to exact target dimensions
                                 gemini_img_bytes = resize_image_to_target_size(
                                     gemini_img_bytes, 
                                     size_config["width"], 
@@ -1714,439 +1750,6 @@ if st.button("Process Selected Images"):
         global image_cols
         image_cols = [col for col in output_df.columns if "Image_" in col]
         output_df[image_cols] = output_df[image_cols].apply(shift_left_and_pad, axis=1)
-
-        st.subheader("Final Results")
-        st.dataframe(output_df)
-
-        # Download CSV
-        csv = output_df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Download Results as CSV",
-            data=csv,
-            file_name='final_results.csv',
-            mime='text/csv',
-        ) the image to exact target dimensions
-                                        gemini_img_bytes = resize_image_to_target_size(
-                                            gemini_img_bytes, 
-                                            size_config["width"], 
-                                            size_config["height"]
-                                        )
-
-                                        gemini_image_url = upload_pil_image_to_s3(
-                                            image=gemini_img_bytes,
-                                            bucket_name=S3_BUCKET_NAME,
-                                            aws_access_key_id=AWS_ACCESS_KEY_ID,
-                                            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                                            region_name=AWS_REGION
-                                        )
-                                    else:
-                                        st.text('Image not created, retry')
-                                        continue
-                                    if gemini_image_url:
-                                        topic_images.append({
-                                            'url': gemini_image_url,
-                                            'selected': False,
-                                            'template': template_str,
-                                            'source': 'gemini',
-                                            'dalle_generated': False
-                                        })
-
-                                    my_bar.progress(percent_complete, text=progress_text)
-                                    completed_images_count += 1
-                                    batch_complete_counter += 1
-                        else:
-                            st.text(f"img prompt {gemini_prompt.replace('\n', '')}")
-                            gemini_img_bytes = gen_gemini_image(gemini_prompt)
-                            if gemini_img_bytes is not None:
-                                # Get the target size from the row
-                                size_key = row.get("size", "1000x1000")
-                                size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
-
-                                       # Resize the image to exact target dimensions
-                                        gemini_img_bytes = resize_image_to_target_size(
-                                        gemini_img_bytes, 
-                                        size_config["width"], 
-                                        size_config["height"]
-                                        )
-
-                                        gemini_image_url = upload_pil_image_to_s3(image = gemini_img_bytes ,bucket_name=S3_BUCKET_NAME,
-                                                    aws_access_key_id=AWS_ACCESS_KEY_ID,
-                                                    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                                                    region_name=AWS_REGION
-                                                )
-                                    else:
-                                        st.text('Image not created, retry')
-                                        continue
-                                    if gemini_image_url:
-                                                topic_images.append({
-                                                    'url': gemini_image_url,
-                                                    'selected': False,
-                                                    'template': template_str,
-                                                    'source': 'gemini',            # Mark as flux
-                                                    'dalle_generated': False     # Not relevant for flux, but keep structure
-                                                })
-                                                
-                                        
-                                    # percent_complete = percent_complete + 1/total_images
-
-                                    my_bar.progress(percent_complete, text=progress_text)
-                                    completed_images_count += 1
-                                    batch_complete_counter += 1
-
-                                
-                        else:
-
-                            st.text(f"img prompt {gemini_prompt.replace('\n','')}")
-                            gemini_img_bytes = gen_gemini_image(gemini_prompt)
-                            if gemini_img_bytes is not None:
-                                # Get the target size from the row
-                                  size_key = row.get("size", "1000x1000")
-                                  size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
-                                      # Resize to exact target dimensions
-                                  gemini_img_bytes = resize_image_to_target_size(
-                                   gemini_img_bytes, 
-                                   size_config["width"], 
-                                   size_config["height"]
-                                 )
-
-                                gemini_image_url = upload_pil_image_to_s3(image = gemini_img_bytes ,bucket_name=S3_BUCKET_NAME,
-                                            aws_access_key_id=AWS_ACCESS_KEY_ID,
-                                            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                                            region_name=AWS_REGION
-                                        )
-                    else:
-                        st.text('Image not created, retry')
-                        continue
-                    if gemini_image_url:
-                                topic_images.append({
-                                    'url': gemini_image_url,
-                                    'selected': False,
-                                    'template': template_str,
-                                    'source': 'gemini',            # Mark as flux
-                                    'dalle_generated': False     # Not relevant for flux, but keep structure
-                                })
-
-                    percent_complete = percent_complete + 1/total_images
-
-                    my_bar.progress(percent_complete, text=progress_text)
-                    completed_images_count += 1
-
-                else:
-                # Otherwise, use FLUX to generate
-                    topic = temp_topic
-                    if '^' in topic:
-                        topic = random.choice(topic.split("^"))
-
-                    new_prompt = False
-                    if "," in template_str:
-                        template = random.choice([int(x) for x in template_str.split(",")])
-                    elif "*" in template_str:
-                        new_prompt = random.choice([True, False])
-                        template_str = template_str.replace("*", "")
-                        template = int(template_str)
-                    else:
-                        template = int(template_str)
-
-                    with st.spinner(f"Generating image {completed_images_count } for '{topic}'..."):
-                        if template == 5:
-                            rand_prompt = f"""Generate a concise visual image description (15 words MAX) for {topic}.
-                            Be wildly creative, curious, and push the limits of imagination—while staying grounded in real-life scenarios!
-                            Depict an everyday, highly relatable yet dramatically eye-catching scene that sparks immediate curiosity within 3 seconds.
-                            Ensure the image conveys the value of early detection (e.g., saving money, time, improving health, or education) in a sensational but simple way.
-                            The scene must feature one person, clearly illustrating the topic without confusion.
-                            Avoid surreal or abstract elements; instead, focus on relatable yet RANDOM high-energy moments from daily life.
-                            Do not include any text in the image.
-                            Your final output should be 8-13 words, written as if describing a snapshot from a camera.
-                            Make sure the offer’s value is unmistakably clear and visually intriguing"""
-                            image_prompt = chatGPT(rand_prompt, model='gpt-4', temperature=1.2)
-                            st.markdown(image_prompt)
-                        elif template == 7 :
-                            image_prompt = chatGPT(f"Generate a  visual image description  50 words MAX for  {topic} , candid moment unstaged , taken  in the moment by eye witness like with a smartphone, viral reddit style, make it dramatic and visually enticing",  
-                                        model='o1-mini',
-                                #temperature=1.15
-                                
-                            )
-                        # elif not new_prompt:
-                        #     image_prompt = chatGPT(
-                        #         f"""Generate a  visual image description  15 words MAX for  {topic}.
-                        #         Be creative, show the value of the offer (saving money, time, health, etc.) in a sensational yet simplistic scene.
-                        #         Include one person and do not include text in the image. 
-                        #         Output is up to 5 words. Think like a camera snapshot!""",
-                        #         model='gpt-4',
-                        #         temperature=1.15
-                        #     )
-                        elif template == 8:
-                            image_prompt = chatGPT( f"A clean, high-resolution stock photo prompt of {topic}, no people, well-lit with natural or studio lighting, minimalist background, professionally styled — perfect for commercial or editorial use.")
-
-                            
-                        else:
-                            image_prompt = chatGPT(
-                                f"""Generate a  visual image description 15 words MAX for {topic}.
-                                Use a visually enticing style with high CTR, avoid obvious descriptions."""
-                                
-                            )
-
-                        # Generate with FLUX
-                        if template == 5:
-                            image_url = gen_flux_img(
-                                f"{random.choice(['cartoony clipart of ', 'cartoony clipart of ', '', ''])}{image_prompt}",
-                                width=688,
-                                height=416
-                            )
-                        if template == 7:
-                            image_url = gen_flux_img_lora(
-                                image_prompt )
-                            
-                        if template == 8:
-                            st.text("mayyyyy" +image_prompt)
-                            image_url = gen_flux_img(
-                                image_prompt, width=720, height=480 )
-                        if template == 9:
-                            st.text("mayyyyy" +image_prompt)
-                            image_url = gen_flux_img(
-                                image_prompt, width=720, height=480 )
-                                
-                            
-                        else:
-                            image_url = gen_flux_img(
-                                f"{random.choice(['cartoony clipart of ', 'cartoony clipart of ', '', ''])}{image_prompt}"
-                            )
-
-                        if image_url:
-                            topic_images.append({
-                                'url': image_url,
-                                'selected': False,
-                                'template': template,
-                                'source': 'flux',            # Mark as flux
-                                'dalle_generated': False     # Not relevant for flux, but keep structure
-                            })
-                        percent_complete = percent_complete + 1/total_images
-                        completed_images_count += 1
-                        
-                        # my_bar.progress(percent_complete, text=progress_text)
-
-
-        # Append the images for this topic
-        st.session_state.generated_images.append({
-            "topic": topic,
-            "lang": lang,
-            "images": topic_images
-        })
-    play_sound("audio/bonus-points-190035.mp3")
-
-# Step 2: Display generated images in a grid
-if auto_mode and st.session_state.generated_images:
-
-    for entry in st.session_state.generated_images:
-        images= entry["images"] 
-        for img in images:
-            img['selected_count'] = 1
-
-
-
-
-
-if st.session_state.generated_images: 
-    st.subheader("Select Images to Process")
-    zoom = st.slider("Zoom Level", min_value=50, max_value=500, value=300, step=50)
-
-    for entry in st.session_state.generated_images:
-        topic = entry["topic"]
-        lang = entry["lang"]
-        images = entry["images"]
-
-        st.write(f"### {topic} ({lang})")
-
-        num_columns = 6
-        rows = (len(images) + num_columns - 1) // num_columns
-
-        for row in range(rows):
-            cols = st.columns(num_columns)
-            for col, img in zip(cols, images[row * num_columns:(row + 1) * num_columns]):
-                with col:
-                    st.image(img['url'], width=zoom)
-                    unique_key = f"num_select_{topic}_{lang}_{img['url']}"
-                    try:
-                        if auto_mode:
-                            img['selected_count'] = st.number_input(
-                                f"Count for {img['url'][-5:]}",
-                                min_value=0, max_value=10,value = 1, key=unique_key ,
-                            )                        
-                        else:
-                    
-                            img['selected_count'] = st.number_input(
-                                f"Count for {img['url'][-5:]}",
-                                min_value=0, max_value=10, value=0, key=unique_key ,
-                            )
-                    except:img['selected_count'] = 0
-
-                    # DALL-E Variation button for Google images
-                    if img.get("source") == "google" and not img.get("dalle_generated", False):
-                        if st.button("Get DALL-E Variation", key=f"dalle_button_{topic}_{img['url']}"):
-                            dalle_url = create_dalle_variation(img['url'],img.get("selected_count"))
-                            if dalle_url:
-                                for dalle_img in dalle_url:
-                                        
-                                    st.success("DALL-E variation generated!")
-                                    img["dalle_generated"] = True
-                                    # Append the new DALL-E image
-                                    entry["images"].append({
-                                        "url": dalle_img.url,
-                                        "selected": False,
-                                        "template": img["template"],
-                                        "source": "dalle",
-                                        "dalle_generated": True
-                                    })
-                                    # st.experimental_rerun()
-
-# Step 3: Process selected images -> generate HTML, screenshot, upload to S3
-if st.button("Process Selected Images"):
-    final_results = []
-
-    for entry in st.session_state.generated_images:
-        topic = entry["topic"]
-        lang = entry["lang"]
-        images = entry["images"]
-
-        res = {'Topic': topic, 'Language': lang}
-        print(topic)
-        selected_images = [img for img in images if img['selected_count'] > 0]
-
-        # We'll store CTA text per language in a dict to avoid repeated calls
-        cta_texts = {}
-
-        for idx, img in enumerate(selected_images):
-            for i in range(img['selected_count']):
-                template = img['template']
-
-                if type(template) == str and "gemini" in template:
-                    res[f'Image_{idx + 1}__{i + 1}'] = img['url']
-                    continue
-
-                # Decide which prompt to use for headline
-                if template == 1 or template == 2:
-                    headline_prompt = (
-                        f"write a short text (up to 20 words) to promote an article about {topic} in {lang}. "
-                        f"Goal: be concise yet compelling to click."
-                    )
-                elif template in [3]:
-                    headline_prompt = (
-                        f"write 1 statement, same length, no quotes, for {re.sub(r'\\|.*','',topic)} in {lang}."
-                        f"Examples:\n'Surprising Travel Perks You Might Be Missing'\n"
-                        f"'Little-Known Tax Tricks to Save Big'\n"
-                        f"Dont mention 'Hidden' or 'Unlock'."
-                    )
-                elif template in [5]:
-                    headline_prompt = (
-                        f"write 1 statement, same length, no quotes, for {re.sub(r'\\|.*','',topic)} in {lang}. "
-                        f"ALL IN CAPS. wrap the 1-2 most urgent words in <span class='highlight'>...</span>."
-                        f"Make it under 60 chars total, to drive curiosity."
-                    )
-                elif template in [7]:
-                    cleaned_topic = re.sub(r'\\|.*','',topic)
-                    headline_prompt = (f"write short punchy 1 sentence text to   this article: \n casual and sharp and consice\nuse ill-tempered language\n don't address the reader (don't use 'you' and etc)\n  \nAvoid dark themes like drugs, death etc..\n MAX 70 CHARS, no !, Title Case, in lang {lang} for: {cleaned_topic}")
-                else:
-                    headline_prompt = f"Write a concise headline for {topic} in {lang}, no quotes."
-
-                if lang in cta_texts:
-                    cta_text = cta_texts[lang]
-                else:
-                    # e.g. "Learn More" in that language
-                    cta_trans = chatGPT(
-                        f"Return EXACTLY the text 'Learn More' in {lang} (no quotes)."
-                    ).replace('"', '')
-                    cta_texts[lang] = cta_trans
-                    cta_text = cta_trans
-
-                # For certain templates, override cta_text or headline
-                if template in [4, 41, 42]:
-                    headline_text = topic
-                    cta_text = chatGPT(
-                        f"Return EXACTLY 'Read more about' in {lang} (no quotes)."
-                    ).replace('"', '')
-                elif template in [6,8]:
-                    headline_text = ''
-                else:
-                    # Generate the main headline with GPT
-                    headline_text = chatGPT(
-                        prompt=headline_prompt,
-                        model='gpt-4'
-                    ).strip('"').strip("'")
-
-                    st.markdown(headline_text)
-
-                # If template=5, generate a "tag_line"
-                if template == 5:
-                    cleaned_topic_tagline = re.sub(r'\\|.*','',topic)
-                    tag_line = chatGPT(
-                        f"Write a short tagline for {cleaned_topic_tagline} in {lang}, "
-                        f"to drive action, max 25 chars, ALL CAPS, possibly with emoji. "
-                        f"Do NOT mention the topic explicitly."
-                    ).strip('"').strip("'").strip("!")
-                    # Minor formatting fix to keep <span> spacing
-                    headline_text = headline_text.replace(r"</span>", r"</span>   ")
-                else:
-                    tag_line = ''
-
-                # Build final HTML - get size from the original dataframe
-                # Find the corresponding row in the dataframe for this topic/lang
-                df_row = df[(df['topic'] == topic) & (df['lang'] == lang)]
-                if not df_row.empty:
-                    size_key = df_row.iloc[0].get("size", "1000x1000")
-                else:
-                    size_key = "1000x1000"  # fallback
-                
-                size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
-              
-                html_content = save_html(
-                    headline=headline_text,
-                    image_url=img['url'],
-                    cta_text=cta_text,
-                    template=int(template),
-                    tag_line=tag_line,
-                    width=size_config["width"],
-                    height=size_config["height"]
-                )
-
-                # Capture screenshot
-                if template == 8:
-                    screenshot_image = capture_html_screenshot_playwright(
-                        html_content, 
-                        width=size_config["width"], 
-                        height=size_config["height"]
-                    )
-                else:
-                    screenshot_image = capture_html_screenshot_playwright(
-                        html_content,
-                        width=size_config["width"], 
-                        height=size_config["height"]
-                    )
-
-                if screenshot_image:
-                    st.image(screenshot_image, caption=f"Generated Advertisement for {topic}", width=600)
-                    # Upload to S3
-                    s3_url = upload_pil_image_to_s3(
-                        image=screenshot_image,
-                        bucket_name=S3_BUCKET_NAME,
-                        aws_access_key_id=AWS_ACCESS_KEY_ID,
-                        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                        region_name=AWS_REGION
-                    )
-                    if s3_url:
-                        # e.g. "Image_1__1"
-                        res[f'Image_{idx + 1}__{i + 1}'] = s3_url
-
-        final_results.append(res)
-
-    if final_results:
-        output_df = pd.DataFrame(final_results)
-
-        # Reorganize and flatten image links
-        global image_cols
-        image_cols = [col for col in output_df.columns if "Image_" in col]
-        output_df[image_cols] = output_df[image_cols].apply(shift_left_and_pad, axis=1)
-
-        # st.dataframe(output_df.drop_duplicates())
 
         st.subheader("Final Results")
         st.dataframe(output_df)
