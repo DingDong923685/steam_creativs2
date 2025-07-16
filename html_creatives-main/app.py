@@ -1521,10 +1521,10 @@ Format: {size_prompt}""",model="gpt-4o", temperature= 1.0)
                                   size_config = SIZE_CONFIGS.get(size_key, {"width": 1000, "height": 1000})
                                       # Resize to exact target dimensions
                                   gemini_img_bytes = resize_image_to_target_size(
-                                  gemini_img_bytes, 
-                                  size_config["width"], 
-                                  size_config["height"]
-                                   )
+                                   gemini_img_bytes, 
+                                   size_config["width"], 
+                                   size_config["height"]
+                                 )
 
                                 gemini_image_url = upload_pil_image_to_s3(image = gemini_img_bytes ,bucket_name=S3_BUCKET_NAME,
                                             aws_access_key_id=AWS_ACCESS_KEY_ID,
