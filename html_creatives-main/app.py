@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 # Set your OpenAI key for DALL-E
 openai.api_key = st.secrets.get("OPENAI_API_KEY")
-GEMINI_API_KEY =st.secrets.get("GEMINI_API_KEY")
+GEMINI_API_KEY =st.secrets.get("GEMINI_API_KEY1")
 
 def shift_left_and_pad(row):
     """
@@ -224,7 +224,7 @@ def gemini_text(
     if is_pd_policy : prompt += predict_policy
 
     if api_key is None:
-        api_key = os.environ.get("GEMINI_API_KEY")
+        api_key = os.environ.get("GEMINI_API_KEY1")
 
     if not api_key:
         print("Error: API key not provided and GEMINI_API_KEY environment variable not set.")
