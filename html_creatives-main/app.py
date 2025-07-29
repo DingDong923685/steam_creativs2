@@ -22,6 +22,17 @@ import logging
 from openai import OpenAI
 import tempfile
 
+def ensure_insights_guide_text(base_prompt, topic, lang):
+    """
+    Modify prompts to ensure text always contains 'insights for' or 'guide for'
+    """
+    insights_instruction = f"""
+    IMPORTANT: The generated text MUST include either "insights for" or "guide for" (in {lang}) when referring to {topic}. 
+    Examples: "Essential insights for...", "Complete guide for...", "Expert insights for...", "Practical guide for..."
+    """
+    return base_prompt + "\n" + insights_instruction
+
+
 # Size configurations
 SIZE_CONFIGS = {
     "1000x1000": {"width": 1000, "height": 1000},
@@ -1334,54 +1345,39 @@ if st.button("Generate Images"):
                         size_prompt = "square image aspect ratio of 1:1"
 
                     if template_str == 'gemini2':
-                        gemini_prompt = chatGPT(f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use photos',''])}. add a CTA button with 
-                                            'Learn More Here >>' in appropriate language\ns\nstart with '{size_prompt} of '\n\n 
-                            """, model="gpt-4o")
-                    
+                        base_prompt = f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use photos',''])}. add a CTA button with 'Learn More Here >>' in appropriate language\ns\nstart with '{size_prompt} of '\n\n"""
+                        gemini_prompt = chatGPT(ensure_insights_guide_text(base_prompt, topic, lang), model="gpt-4o") 
+                        
                     if template_str == 'gemini3':
-                        gemini_prompt = chatGPT(f""" write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use authentic photos', 'no special photo requirement'])}.\nmake it visually engaging and emotionally intriguing.\nadd a bold CTA button with 'Learn More Here >>' in appropriate language.\nstart the prompt with '{size_prompt} of '\nmake sure the image grabs attention and sparks curiosity.\n
-                                            """, model="gpt-4o")
+                        base_prompt = f""" write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use authentic photos', 'no special photo requirement'])}.\nmake it visually engaging and emotionally intriguing.\nadd a bold CTA button with 'Learn More Here >>' in appropriate language.\nstart the prompt with '{size_prompt} of '\nmake sure the image grabs attention and sparks curiosity.\n"""
+                        gemini_prompt = chatGPT(ensure_insights_guide_text(base_prompt, topic, lang), model="gpt-4o")
 
                     if template_str == 'gemini':
-                        gemini_prompt = chatGPT(f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use photos',''])}. add a CTA button with 
-                                                'Learn More Here >>' in appropriate language\nshould be low quality and very enticing and alerting\nstart with '{size_prompt} of '\n\n example output:\n\n{size_prompt} of a concerned middle-aged woman looking at her tongue in the mirror under harsh bathroom lighting, with a cluttered counter and slightly blurry focus — big bold red text says "Early Warning Signs?" and a janky yellow button below reads "Learn More Here >>" — the image looks like it was taken on an old phone, with off angle, bad lighting, and a sense of urgency and confusion to provoke clicks.
-                            """, model="gpt-4o", temperature=1.0)
+                        base_prompt = f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use photos',''])}. add a CTA button with 
+                          'Learn More Here >>' in appropriate language\nshould be low quality and very enticing and alerting\nstart with '{size_prompt} of '\n\n example output:\n\n{size_prompt} of a concerned middle-aged woman looking at her tongue in the mirror under harsh bathroom lighting, with a cluttered counter and slightly blurry focus — big bold red text says "Early Warning Signs?" and a janky yellow button below reads "Learn More Here >>" — the image looks like it was taken on an old phone, with off angle, bad lighting, and a sense of urgency and confusion to provoke clicks."""
+                        gemini_prompt = chatGPT(ensure_insights_guide_text(base_prompt, topic, lang), model="gpt-4o", temperature=1.0)
                     
                     if template_str == 'gemini7_comic':
-                        gemini_prompt = gemini_text_lib(f"""write short prompt for
-                            generate {size_prompt} promoting '{topic}' in language {lang}. add a CTA button with 
-                            'Learn More Here >>' in appropriate language
-                            
-                            should be low quality, very enticing and alerting . use saturated color theme (e.g. red, blue, green, or pink), just one. 
-                            image should be chaotic but readable, styled like an ad that grabs attention.
-                            
-                            start with '{size_prompt} of'
-                            
-                            be specific in what is shown: include a person interacting with the product or benefit, big bold text in {lang}, and bright graphic elements like rays or dots in the background.
-                            
-                            return JUST the best option, no intros
-                            """)
+                        base_prompt = f"""write short prompt for generate {size_prompt} promoting '{topic}' in language {lang}. add a CTA button with 'Learn More Here >>' in appropriate language should be low quality, very enticing and alerting . use saturated color theme (e.g. red, blue, green, or pink), just one. image should be chaotic but readable, styled like an ad that grabs attention. start with '{size_prompt} of' be specific in what is shown: include a person interacting with the product or benefit, big bold text in {lang}, and bright graphic elements like rays or dots in the background. return JUST the best option, no intros"""
+                        gemini_prompt = gemini_text_lib(ensure_insights_guide_text(base_prompt, topic, lang))
+
 
                     if template_str == 'gemini6':
                         cleaned_topic = re.sub('\\|.*', '', topic)
                         headline_temp = gemini_text(f"""write 1 statement,kinda clickbaity, very consice and action click driving, same length, no quotes, for {cleaned_topic} in {lang}. Examples:\n'Surprising Travel Perks You Might Be Missing'\n 'Little-Known Tax Tricks to Save Big'\n Dont mention 'Hidden' or 'Unlock'.\nmax  6 words""")
-
-                        gemini_prompt = chatGPT(f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use photos',''])}. add a CTA button with 
-                                                'Learn More Here >>' in appropriate language\nshould be low quality and very enticing and alerting\ninclude the following text in the image '{headline_temp}\nstart with '{size_prompt} of '\n\n example output:\n\n{size_prompt} of a concerned middle-aged woman looking at her tongue in the mirror under harsh bathroom lighting, with a cluttered counter and slightly blurry focus — big bold red text says "Early Warning Signs?" and a janky yellow button below reads "Learn More Here >>" — the image looks like it was taken on an old phone, with off angle, bad lighting, and a sense of urgency and confusion to provoke clicks.
-                            """, model="gpt-4o", temperature=1.0)
+                        base_prompt = f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use photos',''])}. add a CTA button with 'Learn More Here >>' in appropriate language\nshould be low quality and very enticing and alerting\ninclude the following text in the image '{headline_temp}\nstart with '{size_prompt} of '\n\n example output:\n\n{size_prompt} of a concerned middle-aged woman looking at her tongue in the mirror under harsh bathroom lighting, with a cluttered counter and slightly blurry focus — big bold red text says "Early Warning Signs?" and a janky yellow button below reads "Learn More Here >>" — the image looks like it was taken on an old phone, with off angle, bad lighting, and a sense of urgency and confusion to provoke clicks."""
+                        gemini_prompt = chatGPT(ensure_insights_guide_text(base_prompt, topic, lang), model="gpt-4o", temperature=1.0)
                     
                     if template_str == 'gemini4':
-                        gemini_prompt = chatGPT(f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use photos',''])}. add a CTA button with 
-                                                'Learn More Here >>' in appropriate language and a driving enticing copy in the image\nMUST be be low quality design , stress that!! and very enticing and alerting,high energy enticing, describe the visuals\nstart with '{size_prompt} of '\n\n example output:\n\n{size_prompt} of .....
-                            """, model="gpt-4o", temperature=1.0)
+                        base_prompt = f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' in language {lang} {random.choice(['use photos',''])}. add a CTA button with 'Learn More Here >>' in appropriate language and a driving enticing copy in the image\nMUST be be low quality design , stress that!! and very enticing and alerting,high energy enticing, describe the visuals\nstart with '{size_prompt} of '\n\n example output:\n\n{size_prompt} of ....."""
+                        gemini_prompt = chatGPT(ensure_insights_guide_text(base_prompt, topic, lang), model="gpt-4o", temperature=1.0)
 
                     if template_str == 'gemini5':
                         gemini_prompt_angle = chatGPT(f"""For the topic  {topic}, imagine a highly specific and unusual moment in someone's everyday life that would visually hint at the condition — but in a confusing, unexpected way.\nThe moment should:\n– Feel personal, like something they might do alone out of worry or curiosity\n– Be visually simple but puzzling \n-High energy and dramatic\n– Create just enough mystery that the viewer thinks: "Wait… why would someone do that?"\n\nCome up with one clever, click-provoking scenario that could be captured in a smartphone photo, \n must be highly engaging visually for the topic, to be for image prompt.\nReturn just the angle, consicly in 1 sentence up to 16 words""", model="o1", temperature=0)
                         st.text(f"Angle {gemini_prompt_angle}")
                         cleaned_angle = gemini_prompt_angle.replace('\n', '')
-                        gemini_prompt = chatGPT(f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' using this angle {cleaned_angle} in language {lang} {random.choice(['use photos',''])}. add a CTA button with 
-                                                'Learn More Here >>' in appropriate language\nshould be low quality and very enticing and alerting\nstart with '{size_prompt} of '\n\n example output:\n\n{size_prompt} of a concerned middle-aged woman looking at her tongue in the mirror under harsh bathroom lighting, with a cluttered counter and slightly blurry focus — big bold red text says '.....' and a janky yellow button below reads 'Learn More Here >>' — the image looks like it was taken on an old phone, with off angle, bad lighting, and a sense of urgency and confusion to provoke clicks.
-                            """, model="gpt-4o", temperature=1.0)
+                        base_prompt = f"""write short prompt for\ngenerate {size_prompt} promoting '{topic}' using this angle {cleaned_angle} in language {lang} {random.choice(['use photos',''])}. add a CTA button with 'Learn More Here >>' in appropriate language\nshould be low quality and very enticing and alerting\nstart with '{size_prompt} of '\n\n example output:\n\n{size_prompt} of a concerned middle-aged woman looking at her tongue in the mirror under harsh bathroom lighting, with a cluttered counter and slightly blurry focus — big bold red text says '.....' and a janky yellow button below reads 'Learn More Here >>' — the image looks like it was taken on an old phone, with off angle, bad lighting, and a sense of urgency and confusion to provoke clicks."""
+                        gemini_prompt = chatGPT(ensure_insights_guide_text(base_prompt, topic, lang), model="gpt-4o", temperature=1.0)
 
                     if template_str == 'geministock':
                         gemini_prompt = chatGPT(f""" write short image prompt for {topic},no text on image,A high-quality  image in a realistic setting, well-lit and visually appealing, suitable for use in marketing or editorial content.
@@ -1633,10 +1629,12 @@ if st.button("Process Selected Images"):
                     headline_prompt = (
                         f"write a short text (up to 20 words) to promote an article about {topic} in {lang}. "
                         f"Goal: be concise yet compelling to click."
+                        f"MUST include either 'insights for' or 'guide for' in the text."
                     )
                 elif template in [3]:
                     headline_prompt = (
                         f"write 1 statement, same length, no quotes, for {re.sub(r'\\|.*','',topic)} in {lang}."
+                        f"MUST include either 'insights for' or 'guide for' in the text. "
                         f"Examples:\n'Surprising Travel Perks You Might Be Missing'\n"
                         f"'Little-Known Tax Tricks to Save Big'\n"
                         f"Dont mention 'Hidden' or 'Unlock'."
@@ -1645,6 +1643,7 @@ if st.button("Process Selected Images"):
                     headline_prompt = (
                         f"write 1 statement, same length, no quotes, for {re.sub(r'\\|.*','',topic)} in {lang}. "
                         f"ALL IN CAPS. wrap the 1-2 most urgent words in <span class='highlight'>...</span>."
+                        f"MUST include either 'INSIGHTS FOR' or 'GUIDE FOR' in the text. "
                         f"Make it under 60 chars total, to drive curiosity."
                     )
                 elif template in [7]:
