@@ -1,0 +1,81 @@
+"**EVALUATION BASED ON GOOGLE ADS TRAFFIC SOURCE CREATIVE POLICY:**
+
+**Ad Title Policy Compliance**  
+Evaluate each ad title against these core policy requirements:
+
+---
+
+**🔒 KEY POLICY CHECKS:**
+
+**1. Clear and Honest Promises (Policy #3)**  
+✓ Are promises concrete and explicitly stated?  
+✓ Can the promises actually be fulfilled by the article?  
+❌ Vague promises like ""Graduate education should be affordable! Let's go!""
+
+**2. Avoid Impossible/Misleading Promises (Policy #4)**  
+❌ Free offers that cannot be delivered  
+❌ Unreasonably cheap offers  
+❌ Promises outside your control  
+❌ Misrepresentation of identity or capabilities  
+❌ ""New"" claims (""New"", ""Nuovo"", ""Neu"", ""Neuf"", ""Nuevo"", etc.) unless article explicitly discusses newly introduced/launched content
+
+**3. Claims Must Be Fulfilled on Destination Page (Policy #6)**  
+**For informational content (most articles):**  
+✓ Use language like ""Find out"", ""Learn about"", ""Discover""  
+❌ Don't promise direct transactions (""Get"", ""Buy"", ""Apply now"") unless actually available  
+❌ Don't promise specific deals/offers unless they exist on the page  
+
+**CRITICAL: Price/Pricing Claims Must Have Actual Numbers:**  
+❌ ""New Prices"", ""See Prices"", ""Pricing Information"" → Article must contain specific price figures/ranges  
+❌ ""Price List"", ""Cost Breakdown"" → Article must show actual itemized costs  
+✓ ""Learn about pricing factors"" → General discussion of what affects costs is sufficient  
+✓ ""Pricing information available"" only if actual prices/ranges are provided in article
+
+**4. No Claims Based on Dynamic Content (Policy #8)**  
+❌ Don't promise content from ads, feeds, or other dynamic elements you don't control  
+❌ Don't use dynamic variables (${city}$, ${location}$, etc.) unless article covers ALL possible locations  
+✓ Only promise what's actually in your article content  
+❌ Never use the word 'Free' in any language  
+❌ Never allow 'Before and After' style claims or phrasing  
+❌ Never promise a tool, result, or service from external sources (e.g., ""Get home value by postcode for free"")  
+→ Informational content should never suggest that readers will receive a real-world product or service directly  
+❌ Avoid urgency or manipulative language like “Hurry”, “Now”, “Instantly”, “Unbelievable”, “Shocking”, or “Only X left”  
+❌ No false scarcity (limited quantity, expiration timers) or regional bait (“Only in your area”)  
+❌ Don’t use “Search”, “Download”, “Install”, “Start”, “Apply now”, “Get Quotes” unless the function is on the article page  
+❌ Avoid guaranteed approval, fixed interest rates, or fast-cash claims  
+
+**5. Implied Function and User Expectations (Policy #6 Extension)**  
+❌ If the ad suggests a specific function, structure, or format (e.g., ""price list"", ""eligibility tool"", ""savings calculator"", ""step-by-step guide""), the article must clearly fulfill that exact expectation  
+❌ General mentions (e.g., price ranges, tool descriptions, summaries) are not enough to support claims of a specific list, calculator, or interactive function  
+❌ Ad titles must not suggest specific products, services, or benefits that are not immediately visible or easily accessible on the landing page  
+❌ Do not imply users will receive a benefit or offer if the destination is a general informational page or includes a Related Search Unit  
+❌ Promised offers must not require extensive scrolling or multiple clicks to find  
+❌ Do NOT imply the user will receive a list, catalog, product view, selection, or tool (e.g., “see houses,” “check the price list,” “view product options”) unless the article explicitly provides this structure in a clear, labeled format  
+❌ Do NOT suggest users will discover or uncover options — this implies access to dynamic content or listings that may not exist  
+❌ Do NOT use words that translate to “discover,” “see selection,” “check list,” “explore homes,” etc., unless those things visibly exist in the article  
+❌ Titles must not imply users will receive a list, catalog, product view, or visual selection unless the article clearly provides that exact structure  
+❌ Phrases that translate to or suggest actions like “discover,” “explore,” “see options,” or “check out designs” often imply that the user will access specific plans, images, or listings  
+✅ These are only allowed if the article explicitly includes such structured, visual, or itemized content. Otherwise, they are misleading.
+❌ If the ad title implies a list, catalog, gallery, comparison, or tool, the article must visibly deliver this as a clear, labeled structure (not just general discussion).
+❌ If the title uses or translates to terms like “discover,” “explore,” “check out,” “see options,” “meet the designs,” or similar, the article must include:
+
+A structured visual preview, gallery, table, or list of 3 or more clear examples,
+
+Or clearly labeled sections that fulfill the expectation of variety or comparison (e.g., multiple model names, images, or breakdowns).
+
+❌ These expectations apply in all languages — even soft verbs like “พบกับ” (Thai), “Descubre” (Spanish), “Découvrez” (French), “Erkunde” (German), etc., trigger this rule.
+
+❌ Do NOT approve if the article includes only general discussion, 1–2 examples, or descriptive overviews. These do not fulfill the user expectation of discovering or browsing options.
+✅ Only mark Green if the article visibly provides the promised format, selection, or interactive value. Otherwise, mark Red — even if the article is related or well written.
+**6. Required Informational Framing (Policy #14)**
+Every ad title must use clear educational or instructional language that signals a text‑based guide, such as “How to…,” “Guide to…,” “Tips for…,” or light CTAs like “Check It Out” or “Learn More.”  
+Titles lacking an instructional or educational signal are non‑compliant (Red).
+Phrases like “Choose the Best…” are permitted to describe your selection criteria—no mandatory “Top N” list or comparison table is required. However, any transactional or real‑world promise (e.g., “Buy,” “Apply,” “View Listings”) remains prohibited unless the article provides that exact functionality.
+
+If the title implies browsing, purchasing, or listing real‑world products or services, it is only allowed when the article includes a clearly labeled, structured section (e.g., list, gallery, comparison table, or tool) that directly fulfills that promise. Otherwise, the title must remain purely informational.
+**7. No Implicit Listing Claims Without Structure (Policy #15)**
+❌ Titles implying real‑world listings, sales, or offers—such as those containing “for Sale,” “Listings,” or “Offers”—must be marked Red if the article does not include a clearly labeled, structured section (list, catalog, or gallery) matching that expectation.
+
+
+IMPORTANT: The top-line `Ads:` summary **must exactly match** your final decision. If you revise a title’s rating during evaluation, update the summary line accordingly.
+"
