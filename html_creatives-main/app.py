@@ -39,10 +39,10 @@ def load_predict_policy(file_name="google_ads_policy.txt"):
     ]
     
     # Debug: Show what paths we're trying
-    st.write("**Policy File Debug Info:**")
-    st.write(f"Script directory: {script_dir}")
-    st.write(f"Current working directory: {os.getcwd()}")
-    st.write(f"Files in script directory: {os.listdir(script_dir) if os.path.exists(script_dir) else 'Directory not accessible'}")
+   # st.write("**Policy File Debug Info:**")
+   # st.write(f"Script directory: {script_dir}")
+   # st.write(f"Current working directory: {os.getcwd()}")
+   # st.write(f"Files in script directory: {os.listdir(script_dir) if os.path.exists(script_dir) else 'Directory not accessible'}")
     
     for path in possible_paths:
         try:
