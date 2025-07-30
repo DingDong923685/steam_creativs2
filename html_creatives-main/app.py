@@ -22,6 +22,21 @@ import logging
 from openai import OpenAI
 import tempfile
 
+def load_predict_policy(file_path="google_ads_policy.txt"):
+    """
+    Load the Google Ads policy from an external text file
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.read()
+    except FileNotFoundError:
+        st.error(f"Policy file '{file_path}' not found. Please ensure the file exists.")
+        return ""
+    except Exception as e:
+        st.error(f"Error loading policy file: {str(e)}")
+        return ""
+
+
 def ensure_insights_guide_text(base_prompt, topic, lang):
     """
     Modify prompts to ensure text always contains 'insights for' or 'guide for'
@@ -1236,7 +1251,7 @@ def create_dalle_variation(image_url, count):
         st.error(f"Error generating DALL-E variation: {e}")
         return None
 
-predict_policy = """ text should always include insights for/guide to.  Approved CTAs: Use calls-to-action like "Learn More" or "See Options" that clearly indicate leading to an article. Avoid CTAs like "Apply Now" or "Shop Now" "Today" that promise value not offered on the landing page.   \nProhibited Language: Do not use urgency terms ("Click now"), geographic suggestions ("Near you"), or superlatives ("Best") or "Limited Time" "Last Spots", "WARNING", "URGENT" "Get Today" .never use "Today"!.   \nEmployment/Education Claims: Do not guarantee employment benefits (like high pay or remote work) or education outcomes (like degrees or job placements).   \nFinancial Ad Rules: Do not guarantee loans, credit approval, specific investment returns, or debt relief. Do not offer banking, insurance, or licensed financial services. Avoid showing money bills  \n"Free" Promotions: Generally avoid promoting services/products as "free". Exceptions require clarity: directing to an info article about a real free service, promoting a genuinely free course, or advertising free trials with clear terms. USE text on image, the most persuasive as you can you can.The above is regarding the text, for   visual elements and design use it  make up for the policy to make the design very enticing!!!!  .the above is NOT relevent to the visual aspect of the image!  The visual design must be extremely enticing to compensate for the strict text limitations. text should always include insights for/guide to. """
+predict_policy = load_predict_policy()
 
 # --------------------------------------------
 # Streamlit UI
