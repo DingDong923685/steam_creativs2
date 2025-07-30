@@ -22,19 +22,45 @@ import logging
 from openai import OpenAI
 import tempfile
 
-def load_predict_policy(file_path="google_ads_policy.txt"):
+def load_predict_policy(file_name="google_ads_policy.txt"):
     """
     Load the Google Ads policy from an external text file
+    Uses multiple path strategies to find the file
     """
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            return file.read()
-    except FileNotFoundError:
-        st.error(f"Policy file '{file_path}' not found. Please ensure the file exists.")
-        return ""
-    except Exception as e:
-        st.error(f"Error loading policy file: {str(e)}")
-        return ""
+    # Get the directory where the current script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, file_name)
+    
+    # List of possible file paths to try
+    possible_paths = [
+        file_path,  # Same directory as script
+        file_name,  # Current working directory
+        os.path.join(os.getcwd(), file_name),  # Explicit current working directory
+    ]
+    
+    # Debug: Show what paths we're trying
+    st.write("**Policy File Debug Info:**")
+    st.write(f"Script directory: {script_dir}")
+    st.write(f"Current working directory: {os.getcwd()}")
+    st.write(f"Files in script directory: {os.listdir(script_dir) if os.path.exists(script_dir) else 'Directory not accessible'}")
+    
+    for path in possible_paths:
+        try:
+            st.write(f"Trying path: {path}")
+            if os.path.exists(path):
+                with open(path, 'r', encoding='utf-8') as file:
+                    content = file.read()
+                    st.success(f"✅ Policy file loaded successfully from: {path}")
+                    return content
+            else:
+                st.write(f"❌ File not found at: {path}")
+        except Exception as e:
+            st.write(f"❌ Error reading {path}: {str(e)}")
+    
+    # If no file found, show error and return empty string
+    st.error(f"❌ Policy file '{file_name}' not found in any of the attempted locations.")
+    st.error("**CRITICAL:** Policy file is required for proper operation. Please ensure the file exists.")
+    return ""
 
 
 def ensure_insights_guide_text(base_prompt, topic, lang):
