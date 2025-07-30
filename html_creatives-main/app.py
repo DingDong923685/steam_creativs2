@@ -46,7 +46,7 @@ def load_predict_policy(file_name="google_ads_policy.txt"):
     
     for path in possible_paths:
         try:
-            st.write(f"Trying path: {path}")
+          #  st.write(f"Trying path: {path}")
             if os.path.exists(path):
                 with open(path, 'r', encoding='utf-8') as file:
                     content = file.read()
