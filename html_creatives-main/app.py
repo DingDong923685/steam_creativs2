@@ -28,7 +28,7 @@ def ensure_insights_guide_text(base_prompt, topic, lang):
     """
     insights_instruction = f"""
     IMPORTANT: The generated text MUST include either "insights for" or "guide for" (in {lang}) when referring to {topic}. 
-    Examples: "Essential insights for...", "Complete guide for...", "Expert insights for...", "Practical guide for..."
+    Examples: "Insights on...", "Guide to...", "How to...", "Learn about...", "Overview of...",  "Tips for...", "Compare Plans...", "Read More About...", "Learn More About...", "Key Facts On...", "Facts On...", "All You Need To Know About...", "Facts You Need To Know About...", "Read All About..."    "
     """
     return base_prompt + "\n" + insights_instruction
 
